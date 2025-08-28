@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #1e1e2f; color: white; text-align: center; padding: 2rem; }
+    .weather-box { background: #2e2e4f; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
+    input { padding: 10px; border-radius: 5px; border: none; width: 70%; }
+    button { padding: 10px; border: none; border-radius: 5px; background: #ff4081; color: white; cursor: pointer; }
+    .spinner { display: none; margin: 20px auto; border: 4px solid rgba(255, 255, 255, 0.2); border-top: 4px solid white; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <h1>🌤 Weather App</h1>
+  <div class="weather-box">
+    <input type="text" id="city" placeholder="Enter city name">
+    <button onclick="getWeather()">Search</button>
+    <div class="spinner" id="spinner"></div>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const apiKey = "3562da9b2222360d085ceed9ab792245"; // 🔑 Replace with your OpenWeatherMap API key
+
+    async function getWeather() {
+      const city = document.getElementById("city").value;
+      const result = document.getElementById("result");
+      const spinner = document.getElementById("spinner");
+
+      if (!city) return alert("Please enter a city name!");
+
+      spinner.style.display = "block";
+      result.innerHTML = "";
+
+      try {
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+        if (!res.ok) throw new Error("City not found");
+        const data = await res.json();
+
+        result.innerHTML = `
+          <h2>${data.name}, ${data.sys.country}</h2>
+          <p>🌡 Temp: ${data.main.temp} °C</p>
+          <p>☁️ Condition: ${data.weather[0].description}</p>
+          <p>💧 Humidity: ${data.main.humidity}%</p>
+          <p>🌬 Wind: ${data.wind.speed} m/s</p>
+        `;
+      } catch (error) {
+        result.innerHTML = `<p style="color: red;">❌ ${error.message}</p>`;
+      } finally {
+        spinner.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
